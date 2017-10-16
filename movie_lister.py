@@ -8,10 +8,6 @@ import subprocess
 import json
 
 
-os.environ['path'] = (os.environ['path'] + ';' +
-                      r'R:\Pipe_Repo\Users\Qurban\applications\ffmpeg\bin')
-
-
 DEFAULT_EXTS = [".mov", ".avi", ".mp4", ".mpeg", ".mkv"]
 
 MovieFileInfo = collections.namedtuple(
