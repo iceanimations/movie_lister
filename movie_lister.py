@@ -33,21 +33,23 @@ def list_movies(directory=None, output=None):
         directory = os.path.abspath('.')
 
     if output is None:
-        output = sys.stdout
-    else:
-        name, ext = os.path.splitext(output)
-        output = '.'.join([name, '.csv'])
+        output = os.path.join(os.path.abspath('.'), 'movie_info.csv')
+        print output
 
-        if os.path.exists(output):
-            count = 1
-            while os.path.exists(output):
-                output = '.'.join([name+'_%d' % count, '.csv'])
-                output += 1
+    name, ext = os.path.splitext(output)
+    output = ''.join([name, '.csv'])
 
-        output = open(output, 'w+')
+    if os.path.exists(output):
+        count = 1
+        while os.path.exists(output):
+            output = '.'.join([name+'_%d' % count, '.csv'])
+            count += 1
+
+    output = open(output, 'w+')
 
     directory = os.path.normpath(directory)
 
+    stdout_writer = csv.writer(sys.stdout)
     writer = csv.writer(output)
     for _file in os.listdir(directory):
         basename, ext = os.path.splitext(_file)
@@ -56,8 +58,12 @@ def list_movies(directory=None, output=None):
             stat = os.stat(full_path)
             mtime = time.asctime(time.localtime(stat.st_mtime))
             size = stat.st_size
-            duration = get_movie_data(full_path)["format"]["duration"]
+            try:
+                duration = get_movie_data(full_path)["format"]["duration"]
+            except subprocess.CalledProcessError:
+                duration = 'ERROR Fetching Info'
             info = MovieFileInfo(full_path, mtime, size, duration)
+            stdout_writer.writerow(info)
             writer.writerow(info)
 
     output.close()
